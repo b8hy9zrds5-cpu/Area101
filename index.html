@@ -1160,6 +1160,24 @@
 <script>
   // ---- Password gate ----
   var GUEST_PASSWORD = "sanxenxo101";
+
+  // Calendario de inquilinos: añade aquí una línea por cada estancia.
+  // La contraseña de cada huésped es su nombre (en minúsculas), válida solo
+  // entre las fechas "start" y "end" (formato AAAA-MM-DD, ambas incluidas).
+  var TENANT_CALENDAR = [
+    { name: "jesus", start: "2026-07-01", end: "2026-07-19" }
+  ];
+
+  function isValidTenantPassword(entered){
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return TENANT_CALENDAR.some(function(t){
+      var start = new Date(t.start + "T00:00:00");
+      var end = new Date(t.end + "T23:59:59");
+      return entered === t.name.toLowerCase() && today >= start && today <= end;
+    });
+  }
+
   var gate = document.getElementById('gate');
   var gateForm = document.getElementById('gate-form');
   var gateInput = document.getElementById('gate-input');
@@ -1167,7 +1185,8 @@
 
   gateForm.addEventListener('submit', function(e){
     e.preventDefault();
-    if(gateInput.value.trim().toLowerCase() === GUEST_PASSWORD.toLowerCase()){
+    var entered = gateInput.value.trim().toLowerCase();
+    if(entered === GUEST_PASSWORD.toLowerCase() || isValidTenantPassword(entered)){
       gate.classList.add('hidden');
     } else {
       gateError.textContent = 'Contraseña incorrecta / Incorrect password';
